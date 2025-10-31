@@ -273,6 +273,28 @@
             overflow-y: auto;
         }
         
+        /* Estilos para o seletor de ano base */
+        .year-selector {
+            margin-bottom: 15px;
+            padding: 12px;
+            background-color: rgba(56, 189, 248, 0.05);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        
+        .year-selector label {
+            display: inline-block;
+            margin-right: 10px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .year-selector select {
+            width: auto;
+            display: inline-block;
+            min-width: 120px;
+        }
+        
         @media (max-width: 768px) {
             .period-container, .action-buttons, .employee-select-container {
                 flex-direction: column;
@@ -284,6 +306,15 @@
             
             .subtitle {
                 font-size: 16px;
+            }
+            
+            .year-selector {
+                text-align: center;
+            }
+            
+            .year-selector select {
+                width: 100%;
+                margin-top: 8px;
             }
         }
     </style>
@@ -328,18 +359,22 @@
 
                 <div class="divider"></div>
 
+                <!-- Seletor de Ano Base -->
+                <div class="year-selector">
+                    <label for="yearSelector">Ano Base para Períodos:</label>
+                    <select id="yearSelector">
+                        <!-- Opções serão preenchidas via JavaScript -->
+                    </select>
+                    <small class="hint">Selecione o ano base para visualizar os períodos</small>
+                </div>
+
                 <!-- Período Adquirido -->
                 <div class="grid">
                     <div class="col-12">
                         <label for="acquiredPeriod">Período Adquirido</label>
                         <select id="acquiredPeriod">
                             <option value="">Selecione o período adquirido</option>
-                            <option value="2020/2021">2020/2021</option>
-                            <option value="2021/2022">2021/2022</option>
-                            <option value="2022/2023">2022/2023</option>
-                            <option value="2023/2024">2023/2024</option>
-                            <option value="2024/2025">2024/2025</option>
-                            <option value="2025/2026">2025/2026</option>
+                            <!-- Opções serão preenchidas dinamicamente via JavaScript -->
                         </select>
                         <small class="hint">Ano referente ao direito de férias do servidor</small>
                     </div>
@@ -540,6 +575,63 @@
             addDebugLog(`${employees.length} servidores carregados no select`);
         }
 
+        // Preencher seletor de ano base
+        function populateYearSelector() {
+            const yearSelector = document.getElementById('yearSelector');
+            const currentYear = new Date().getFullYear();
+            
+            // Limpar opções existentes
+            yearSelector.innerHTML = '';
+            
+            // Adicionar anos de 2000 até 10 anos no futuro
+            for (let year = 2000; year <= currentYear + 10; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                
+                // Definir o ano atual como padrão
+                if (year === currentYear) {
+                    option.selected = true;
+                }
+                
+                yearSelector.appendChild(option);
+            }
+            
+            addDebugLog('Seletor de ano base preenchido');
+        }
+
+        // Preencher períodos adquiridos com base no ano selecionado
+        function populateAcquiredPeriod() {
+            const yearSelector = document.getElementById('yearSelector');
+            const acquiredPeriod = document.getElementById('acquiredPeriod');
+            const selectedYear = parseInt(yearSelector.value);
+            
+            // Limpar opções existentes, mantendo apenas a primeira opção
+            acquiredPeriod.innerHTML = '<option value="">Selecione o período adquirido</option>';
+            
+            // Adicionar períodos de 5 anos antes até 5 anos depois do ano selecionado
+            for (let i = -5; i <= 5; i++) {
+                const startYear = selectedYear + i;
+                const endYear = startYear + 1;
+                const period = `${startYear}/${endYear}`;
+                
+                const option = document.createElement('option');
+                option.value = period;
+                option.textContent = period;
+                
+                // Destacar o período atual
+                const currentYear = new Date().getFullYear();
+                if (startYear === currentYear) {
+                    option.style.fontWeight = 'bold';
+                    option.style.color = '#22c55e'; // Verde para o ano atual
+                }
+                
+                acquiredPeriod.appendChild(option);
+            }
+            
+            addDebugLog(`Períodos adquiridos atualizados para ano base: ${selectedYear}`);
+        }
+
         // Limpar o formulário após o envio
         function clearForm() {
             document.getElementById('employeeSelect').value = '';
@@ -658,6 +750,8 @@
             addDebugLog(`URL do Apps Script: ${APP_SCRIPT_URL}`);
             
             populateEmployeeSelect();
+            populateYearSelector();
+            populateAcquiredPeriod();
             updateDaysCount();
             
             // Adicionar event listeners para cálculo de dias
@@ -665,6 +759,9 @@
             document.getElementById('period1End').addEventListener('change', updateDaysCount);
             document.getElementById('period2Start').addEventListener('change', updateDaysCount);
             document.getElementById('period2End').addEventListener('change', updateDaysCount);
+
+            // Listener para o seletor de ano base
+            document.getElementById('yearSelector').addEventListener('change', populateAcquiredPeriod);
 
             // Listener para o botão de teste
             document.getElementById('testBtn').addEventListener('click', testConnection);
