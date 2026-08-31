@@ -1,13 +1,12 @@
 // ===============================
 // SERVICE WORKER - FÉRIAS HMM
 // ===============================
-const CACHE_NAME = "ferias-hmm-cache-v1";
+const CACHE_NAME = "ferias-hmm-cache-v2";
 const urlsToCache = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./service-worker.js",
-  "./style.css"
+  "./service-worker.js"
 ];
 
 // Instala o Service Worker
