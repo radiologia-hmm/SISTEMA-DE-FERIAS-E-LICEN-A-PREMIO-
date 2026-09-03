@@ -420,6 +420,27 @@
             background: rgba(245, 158, 11, 0.92);
         }
 
+        [hidden] { display: none !important; }
+        body[data-theme="light"] { --bg: #e8f0f7; --bg-soft: #d9e7f1; --panel: #ffffff; --panel-strong: #f5f9fc; --card: #ffffff; --card-alt: #edf4f8; --border: rgba(30, 64, 93, 0.2); --text: #102a43; --muted: #486581; --shadow: 0 18px 45px rgba(27, 55, 79, 0.14); }
+        body[data-theme="light"] .topbar { background: rgba(255, 255, 255, 0.92); }
+        body[data-theme="light"] .topbar .brand h1 { color: #102a43; }
+        body[data-theme="light"] .topbar .brand small { color: #334e68; }
+        body[data-theme="light"] .status-pill { color: #14532d; background: rgba(220, 252, 231, 0.94); }
+        body[data-theme="light"] .card { background: linear-gradient(180deg, #ffffff, #f4f8fb); }
+        body[data-theme="light"] .tab-button { color: #102a43; background: rgba(255, 255, 255, 0.88); }
+        body[data-theme="light"] .tab-button.active { color: #0b3a75; background: #dbeafe; }
+        body[data-theme="light"] th { color: #243b53; background: #e8f1f7; }
+        body[data-theme="light"] .days-info { color: #102a43; background: #eaf4ff; }
+        body[data-theme="light"] .days-info span { color: #075985; }
+        body[data-theme="light"] .tag { color: #0b3a75; background: #dbeafe; border-color: #93c5fd; }
+        body[data-theme="light"] input[type="text"], body[data-theme="light"] input[type="password"], body[data-theme="light"] input[type="date"], body[data-theme="light"] select, body[data-theme="light"] textarea, body[data-theme="light"] .btn, body[data-theme="light"] .table-wrap { background: #ffffff; }
+        .access-card { max-width: 620px; margin: 56px auto; }
+        .access-card p { color: var(--muted); }
+        .access-card input[type="text"], .access-card input[type="password"] { width: 100%; border: 1px solid var(--border); border-radius: 12px; background: rgba(7, 19, 33, 0.86); color: var(--text); padding: 11px 12px; outline: none; }
+        .theme-control { display: flex; align-items: center; gap: 8px; }
+        .theme-control select { min-width: 128px; }
+        .user-area { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+
         @media (max-width: 768px) {
             .topbar {
                 flex-direction: column;
@@ -474,13 +495,30 @@
             </div>
         </header>
 
+        <section id="accessScreen" class="card access-card">
+            <h2 class="section-heading">Acesso ao sistema</h2>
+            <p>Selecione seu perfil para acessar as funções disponíveis.</p>
+            <form id="accessForm">
+                <div class="grid">
+                    <div class="col-12"><label for="accessRole">Perfil</label><select id="accessRole"><option value="professional">Profissional</option><option value="coordinator">Coordenador</option><option value="admin">Administrador</option></select></div>
+                    <div id="professionalFields" class="col-12"><div class="grid"><div class="col-6"><label for="accessName">Nome completo</label><input id="accessName" type="text" autocomplete="name" /></div><div class="col-6"><label for="accessMatricula">Matrícula</label><input id="accessMatricula" type="text" inputmode="numeric" /></div></div></div>
+                    <div id="staffFields" class="col-12" hidden><div class="grid"><div class="col-6"><label for="accessEmail">E-mail pessoal</label><input id="accessEmail" type="text" autocomplete="email" /></div><div class="col-6"><label for="accessPassword">Senha</label><input id="accessPassword" type="password" autocomplete="current-password" /></div></div></div>
+                    <div id="pinFields" class="col-12" hidden><label for="accessPin">PIN de 4 dígitos</label><input id="accessPin" type="text" inputmode="numeric" maxlength="4" autocomplete="one-time-code" /></div>
+                </div>
+                <div class="btn-row"><button id="accessSubmit" class="btn btn-primary" type="submit">Continuar</button></div>
+            </form>
+        </section>
+
+        <div id="notification" class="notification" role="status" aria-live="polite"></div>
+
+        <div id="appShell" hidden>
         <nav class="tabs" aria-label="Menu de navegação do sistema">
             <button class="tab-button active" data-tab="launches" type="button">Lançamentos</button>
             <button class="tab-button" data-tab="members" type="button">Cadastro de Membros</button>
             <button class="tab-button" data-tab="reports" type="button">Relatórios</button>
+            <button class="tab-button" data-tab="security" data-admin-only type="button">Segurança</button>
+            <div class="user-area"><span class="summary" id="sessionUser"></span><label class="theme-control" for="themeSelect">Tema <select id="themeSelect"><option value="system">Sistema</option><option value="light">Claro</option><option value="dark">Escuro</option></select></label><button class="btn btn-muted" id="logoutBtn" type="button">Sair</button></div>
         </nav>
-
-        <div id="notification" class="notification" role="status" aria-live="polite"></div>
 
         <section id="panel-launches" class="tab-panel active">
             <div class="card">
@@ -713,13 +751,25 @@
                 </div>
             </div>
         </section>
+        <section id="panel-security" class="tab-panel">
+            <div class="card"><h2 class="section-heading">Cadastro de coordenador e equipe</h2><form id="coordinatorForm"><div class="grid"><div class="col-6"><label for="coordinatorName">Nome completo</label><input id="coordinatorName" type="text" required /></div><div class="col-3"><label for="coordinatorEmail">E-mail pessoal</label><input id="coordinatorEmail" type="text" required /></div><div class="col-3"><label for="coordinatorPassword">Senha inicial</label><input id="coordinatorPassword" type="password" required /></div><div class="col-12"><label for="coordinatorMembers">Servidores coordenados</label><select id="coordinatorMembers" multiple size="10"></select><span class="hint">Use Ctrl para selecionar mais de um servidor.</span></div></div><div class="btn-row"><button class="btn btn-primary" type="submit">Cadastrar coordenador</button></div></form></div>
+            <div class="card"><h2 class="section-heading">Coordenadores cadastrados</h2><div id="coordinatorsList" class="summary"></div></div>
+        </section>
+        </div>
     </div>
 
     <script>
         const STORAGE_KEYS = {
             members: 'ferias_members_db',
-            launches: 'ferias_launches_db'
+            launches: 'ferias_launches_db',
+            coordinators: 'ferias_coordinators_db',
+            accessState: 'ferias_access_state',
+            theme: 'ferias_theme'
         };
+
+        const ADMIN_ACCOUNT = { email: 'paraense2001@hotmail.com', password: '30050926#', name: 'Administrador do sistema' };
+        const MAX_ACCESS_FAILURES = 4;
+        const LOCK_DURATION_MS = 10 * 60 * 1000;
 
         const DB_NAME = 'ferias_local_db';
         const DB_VERSION = 1;
@@ -773,10 +823,32 @@
         }
 
         const DEFAULT_MEMBERS = [
-            { id: 1, ordem: 1, matricula: '163067', crtr14: '0475T', name: 'ADONIAS SILVA DE FREITAS', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
-            { id: 2, ordem: 2, matricula: '64245', crtr14: '06831', name: 'CARLOS ALBERTO CERQUEIRA SANTOS JUNIOR', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 1, ordem: 1, matricula: '69067', crtr14: '0475T', name: 'ADONIAS SILVA DE FREITAS', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 2, ordem: 2, matricula: '64245', crtr14: '06883T', name: 'CARLOS ALBERTO CERQUEIRA SANTOS JUNIOR', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
             { id: 3, ordem: 3, matricula: '28581', crtr14: '00050N', name: 'DANIELA DOS SANTOS SILVA', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADA' },
-            { id: 4, ordem: 4, matricula: '68482', crtr14: '07615T', name: 'DAVI ROBERTH LOPES DOS SANTOS', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' }
+            { id: 4, ordem: 4, matricula: '68482', crtr14: '07615T', name: 'DAVI ROBERTH LOPES DOS SANTOS', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 5, ordem: 5, matricula: '56587', crtr14: '07902T', name: 'DENISVAL RODRIGUES', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADO' },
+            { id: 6, ordem: 6, matricula: '57744', crtr14: '03008T', name: 'DIONY MOURÃO ARAÚJO', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADO' },
+            { id: 7, ordem: 7, matricula: '54365', crtr14: '00726N', name: 'GLENDA LUCIA FORO ANDRADE', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADA' },
+            { id: 8, ordem: 8, matricula: '69352', crtr14: '00726N', name: 'GLENDA LUCIA FORO ANDRADE', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 9, ordem: 9, matricula: '68031', crtr14: '02656T', name: 'HEVERSON MOURÃO VIEIRA', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 10, ordem: 10, matricula: '67981', crtr14: '10498T', name: 'ISMAEL RIBEIRO DOS SANTOS', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 11, ordem: 11, matricula: '65683', crtr14: '06385T', name: 'KELISSON ASSIS DE SOUSA', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 12, ordem: 12, matricula: '57835', crtr14: '05888T', name: 'LAIS DE SOUZA CARVALHO', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADA' },
+            { id: 13, ordem: 13, matricula: '54180', crtr14: '08188T', name: 'LUIS CARLOS DE SOUSA OLIVEIRA', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADO' },
+            { id: 14, ordem: 14, matricula: '28412', crtr14: '00037N', name: 'LUIZ HENRIQUE BARBOSA DE SOUSA', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADO' },
+            { id: 15, ordem: 15, matricula: '32655', crtr14: '04799T', name: 'MARCIA DA SILVA OLIVEIRA', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADA' },
+            { id: 16, ordem: 16, matricula: '65565', crtr14: '07034T', name: 'MARIANO MACIEL DOS PASSOS', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 17, ordem: 17, matricula: '68025', crtr14: '07371T', name: 'MARCELO FERNANDES FREITAS', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 18, ordem: 18, matricula: '65685', crtr14: '07602T', name: 'REDSON PEREIRA FEITOZA', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADO' },
+            { id: 19, ordem: 19, matricula: '57745', crtr14: '07718T', name: 'RODRIGO SANTANA MAIA', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADO' },
+            { id: 20, ordem: 20, matricula: '68439', crtr14: '07718T', name: 'RODRIGO SANTANA MAIA', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 21, ordem: 21, matricula: '53779', crtr14: '07572T', name: 'ROQUE JOSE DE NOVAIS FILHO', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADO' },
+            { id: 22, ordem: 22, matricula: '67741', crtr14: '07084T', name: 'SIMONE SOUZA VITOR', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 23, ordem: 23, matricula: '54175', crtr14: '01242T', name: 'THIAGO RODRIGUES DE LIMA', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADO' },
+            { id: 24, ordem: 24, matricula: '56185', crtr14: '04975T', name: 'WANDERLEI ALVES DE FREITAS', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADO' },
+            { id: 25, ordem: 25, matricula: '68470', crtr14: '04975T', name: 'WANDERLEI ALVES FREITAS', position: 'TEC. RADIOLOGIA', vinculo: 'CONTRATADO' },
+            { id: 26, ordem: 26, matricula: '54172', crtr14: '08891T', name: 'WILMARA PEREIRA DE OLIVEIRA', position: 'TEC. RADIOLOGIA', vinculo: 'CONCURSADA' }
         ];
 
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyJ6qYMoooYGY0nVMdi48c5Ak4ldulGe9ueegb0ev0rQwFXTOsAwC40hL0_jO_6bF2s/exec';
@@ -792,6 +864,124 @@
 
         function writeStorage(key, value) {
             localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function normalize(value) { return String(value || '').trim().toLocaleUpperCase('pt-BR'); }
+        function getCoordinators() { const coordinators = readStorage(STORAGE_KEYS.coordinators, []); return Array.isArray(coordinators) ? coordinators : []; }
+        function getAccessState() { return readStorage(STORAGE_KEYS.accessState, { failures: 0, lockedUntil: 0, session: null, pendingPin: null }); }
+        function saveAccessState(state) { writeStorage(STORAGE_KEYS.accessState, state); }
+        function getSession() { return getAccessState().session; }
+
+        function setTheme(theme) {
+            const selectedTheme = theme === 'system' ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : theme;
+            document.body.dataset.theme = selectedTheme;
+            document.getElementById('themeSelect').value = theme;
+            writeStorage(STORAGE_KEYS.theme, theme);
+        }
+
+        function setActiveTab(tab) {
+            document.querySelectorAll('.tab-button').forEach((button) => button.classList.toggle('active', button.dataset.tab === tab));
+            document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === `panel-${tab}`));
+        }
+
+        function getManagedMatriculas() {
+            const session = getSession();
+            if (!session || session.role !== 'coordinator') return null;
+            return getCoordinators().find((item) => item.email.toLowerCase() === session.email.toLowerCase())?.memberMatriculas || [];
+        }
+
+        function getVisibleMembers() {
+            const members = getMembers();
+            const managedMatriculas = getManagedMatriculas();
+            return managedMatriculas === null ? members : members.filter((member) => managedMatriculas.includes(member.matricula));
+        }
+
+        function applySession() {
+            const session = getSession();
+            document.getElementById('accessScreen').hidden = Boolean(session);
+            document.getElementById('appShell').hidden = !session;
+            if (!session) return;
+            const isAdmin = session.role === 'admin';
+            const isStaff = isAdmin || session.role === 'coordinator';
+            document.querySelectorAll('[data-admin-only]').forEach((element) => element.hidden = !isAdmin);
+            document.querySelector('[data-tab="members"]').hidden = !isStaff;
+            document.querySelector('[data-tab="reports"]').hidden = !isStaff;
+            document.getElementById('sessionUser').textContent = `${session.name} (${session.role === 'professional' ? 'Profissional' : session.role === 'admin' ? 'Administrador' : 'Coordenador'})`;
+            const consultation = document.querySelector('#panel-launches > .card:nth-child(2)');
+            populateEmployeeSelect();
+            if (session.role === 'professional') { document.getElementById('employeeSelect').value = session.matricula; document.getElementById('employeeSelect').disabled = true; consultation.hidden = true; }
+            else { document.getElementById('employeeSelect').disabled = false; consultation.hidden = false; }
+            renderCoordinators();
+            setActiveTab('launches');
+        }
+
+        function registerFailure(message, lockable = true) {
+            if (!lockable) { showNotification(message, 'error'); return; }
+            const state = getAccessState();
+            state.failures = (state.failures || 0) + 1;
+            if (state.failures >= MAX_ACCESS_FAILURES) {
+                state.lockedUntil = Date.now() + LOCK_DURATION_MS; state.failures = 0; state.pendingPin = null; saveAccessState(state);
+                showNotification('Acesso bloqueado por 10 minutos devido a tentativas inválidas.', 'error'); return;
+            }
+            saveAccessState(state); showNotification(`${message} Tentativas restantes: ${MAX_ACCESS_FAILURES - state.failures}.`, 'error');
+        }
+
+        function updateAccessFields() {
+            const professional = document.getElementById('accessRole').value === 'professional';
+            document.getElementById('professionalFields').hidden = !professional;
+            document.getElementById('staffFields').hidden = professional;
+            document.getElementById('pinFields').hidden = true;
+            document.getElementById('accessSubmit').textContent = 'Continuar';
+        }
+
+        function handleAccess(event) {
+            event.preventDefault();
+            const state = getAccessState();
+            const role = document.getElementById('accessRole').value;
+            if (role === 'professional' && state.lockedUntil > Date.now()) { const remaining = Math.ceil((state.lockedUntil - Date.now()) / 60000); showNotification(`Acesso bloqueado. Tente novamente em ${remaining} minuto(s).`, 'error'); return; }
+            if (role === 'professional' && state.lockedUntil) { state.lockedUntil = 0; state.failures = 0; saveAccessState(state); }
+            if (role === 'professional') {
+                const pinInput = document.getElementById('accessPin');
+                if (state.pendingPin) {
+                    if (pinInput.value === state.pendingPin.pin) { state.session = { role: 'professional', name: state.pendingPin.name, matricula: state.pendingPin.matricula }; state.pendingPin = null; state.failures = 0; saveAccessState(state); applySession(); }
+                    else registerFailure('PIN inválido.');
+                    return;
+                }
+                const member = getMembers().find((item) => normalize(item.name) === normalize(document.getElementById('accessName').value) && String(item.matricula).trim() === document.getElementById('accessMatricula').value.trim());
+                if (!member) { registerFailure('Nome completo ou matrícula não encontrados.'); return; }
+                const pin = String(Math.floor(1000 + Math.random() * 9000));
+                state.pendingPin = { pin, name: member.name, matricula: member.matricula }; saveAccessState(state);
+                document.getElementById('professionalFields').hidden = true; document.getElementById('pinFields').hidden = false; document.getElementById('accessSubmit').textContent = 'Validar PIN';
+                showNotification(`PIN de acesso gerado: ${pin}.`, 'success'); return;
+            }
+            const email = document.getElementById('accessEmail').value.trim().toLowerCase();
+            const password = document.getElementById('accessPassword').value;
+            const account = role === 'admin' ? ADMIN_ACCOUNT : getCoordinators().find((item) => item.email.toLowerCase() === email);
+            if (!account || account.email.toLowerCase() !== email || account.password !== password) { registerFailure('E-mail ou senha inválidos.', false); return; }
+            state.session = { role, name: account.name, email: account.email }; state.failures = 0; state.pendingPin = null; saveAccessState(state); applySession();
+        }
+
+        function populateCoordinatorMembers() {
+            const select = document.getElementById('coordinatorMembers');
+            select.innerHTML = getMembers().map((member) => `<option value="${member.matricula}">${member.name} - MAT ${member.matricula}</option>`).join('');
+        }
+
+        function renderCoordinators() {
+            const list = getCoordinators();
+            const members = getMembers();
+            document.getElementById('coordinatorsList').textContent = list.length ? list.map((item) => {
+                const names = members.filter((member) => (item.memberMatriculas || []).includes(member.matricula)).map((member) => member.name).join(', ');
+                return `${item.name} - ${item.email} (${(item.memberMatriculas || []).length} coordenado(s): ${names || 'nenhum'})`;
+            }).join(' | ') : 'Nenhum coordenador cadastrado.';
+        }
+        function saveCoordinator(event) {
+            event.preventDefault();
+            const name = document.getElementById('coordinatorName').value.trim(); const email = document.getElementById('coordinatorEmail').value.trim().toLowerCase(); const password = document.getElementById('coordinatorPassword').value;
+            if (!name || !email || !password) { showNotification('Preencha todos os dados do coordenador.', 'error'); return; }
+            const coordinators = getCoordinators();
+            if (coordinators.some((item) => item.email.toLowerCase() === email) || email === ADMIN_ACCOUNT.email) { showNotification('Este e-mail já está cadastrado.', 'error'); return; }
+            const memberMatriculas = Array.from(document.getElementById('coordinatorMembers').selectedOptions).map((option) => option.value);
+            coordinators.push({ id: generateId('coordinator'), name, email, password, memberMatriculas }); writeStorage(STORAGE_KEYS.coordinators, coordinators); event.target.reset(); renderCoordinators(); showNotification('Coordenador cadastrado com sucesso.', 'success');
         }
 
         function showNotification(message, type = 'success') {
@@ -838,18 +1028,15 @@
         function populateEmployeeSelect() {
             const employeeSelect = document.getElementById('employeeSelect');
             const filterMember = document.getElementById('filterMember');
-            const members = getMembers();
-
-            const labels = members.map(member => member.name);
-            const unique = [...new Set(labels)];
+            const members = getVisibleMembers();
 
             employeeSelect.innerHTML = '<option value="">Selecione um servidor</option>';
             filterMember.innerHTML = '<option value="">Todos</option>';
 
-            unique.forEach(name => {
+            members.forEach((member) => {
                 const option = document.createElement('option');
-                option.value = name;
-                option.textContent = name;
+                option.value = member.matricula;
+                option.textContent = `${member.name} - MAT ${member.matricula}`;
                 employeeSelect.appendChild(option.cloneNode(true));
                 filterMember.appendChild(option);
             });
@@ -864,9 +1051,33 @@
             return members;
         }
 
+        async function synchronizeDefaultMembers() {
+            const members = getMembers();
+            const synchronized = [...members];
+            DEFAULT_MEMBERS.forEach((defaultMember) => {
+                const index = synchronized.findIndex((member) => member.ordem === defaultMember.ordem && normalize(member.name) === normalize(defaultMember.name));
+                if (index >= 0) synchronized[index] = { ...synchronized[index], ...defaultMember };
+                else synchronized.push(defaultMember);
+            });
+            synchronized.sort((first, second) => first.ordem - second.ordem);
+            await writeMembers(synchronized);
+        }
+
         function getLaunches() {
             const launches = readStorage(STORAGE_KEYS.launches, []);
             return Array.isArray(launches) ? launches : [];
+        }
+
+        function getAcquisitionYear(acquiredPeriod) {
+            return String(acquiredPeriod || '').split('/')[0];
+        }
+
+        function hasAnnualBenefitLaunch(matricula, benefit, acquiredPeriod) {
+            const acquisitionYear = getAcquisitionYear(acquiredPeriod);
+            return getLaunches().some((launch) => {
+                const launchMatricula = launch.Matrícula || getMembers().find((member) => member.name === launch.Servidor)?.matricula;
+                return launchMatricula === matricula && launch.Benefício === benefit && getAcquisitionYear(launch['Período Adquirido']) === acquisitionYear;
+            });
         }
 
         async function writeMembers(members) {
@@ -971,14 +1182,17 @@
         function getFilteredLaunches() {
             const launches = getLaunches();
             const filter = buildFilterData();
+            const visibleMatriculas = getVisibleMembers().map((member) => member.matricula);
 
             return launches.filter((row) => {
-                const matchMember = !filter.member || row.Servidor === filter.member;
+                const rowMatricula = row.Matrícula || getMembers().find((member) => member.name === row.Servidor)?.matricula;
+                const belongsToCoordinator = getSession()?.role !== 'coordinator' || visibleMatriculas.includes(rowMatricula);
+                const matchMember = !filter.member || rowMatricula === filter.member;
                 const matchBenefit = !filter.benefit || row.Benefício === filter.benefit;
                 const rowDate = row['Data inicial do primeiro período'] || row['Data inicial do segundo período'] || '';
                 const matchFrom = !filter.from || rowDate >= filter.from;
                 const matchTo = !filter.to || rowDate <= filter.to;
-                return matchMember && matchBenefit && matchFrom && matchTo;
+                return belongsToCoordinator && matchMember && matchBenefit && matchFrom && matchTo;
             });
         }
 
@@ -1046,6 +1260,7 @@
             event.preventDefault();
 
             const employeeSelect = document.getElementById('employeeSelect');
+            const member = getMembers().find((item) => item.matricula === employeeSelect.value);
             const benefitType = document.getElementById('benefitType');
             const acquiredPeriod = document.getElementById('acquiredPeriod').value;
             const period1Start = document.getElementById('period1Start').value;
@@ -1054,13 +1269,18 @@
             const period2End = document.getElementById('period2End').value;
             const observation = document.getElementById('observation').value.trim();
 
-            if (!employeeSelect.value) {
+            if (!employeeSelect.value || !member) {
                 showNotification('Selecione um servidor antes de salvar.', 'error');
                 return;
             }
 
             if (!acquiredPeriod) {
                 showNotification('Informe o período adquirido.', 'error');
+                return;
+            }
+
+            if (hasAnnualBenefitLaunch(member.matricula, benefitType.value, acquiredPeriod)) {
+                showNotification(`Já existe um lançamento de ${benefitType.value.toLowerCase()} para esta matrícula no ano de ${getAcquisitionYear(acquiredPeriod)}.`, 'error');
                 return;
             }
 
@@ -1079,8 +1299,9 @@
 
             const payload = {
                 id: generateId('launch'),
-                Servidor: employeeSelect.value,
-                Cargo: 'Técnico de Radiologia',
+                Servidor: member.name,
+                Matrícula: member.matricula,
+                Cargo: member.position,
                 Benefício: benefitType.value,
                 'Período Adquirido': acquiredPeriod,
                 'Data inicial do primeiro período': period1Start,
@@ -1143,14 +1364,14 @@
         }
 
         function exportMembersXml() {
-            const rows = getMembers();
+            const rows = getVisibleMembers();
             const xml = serializeToXml(rows, 'membros', 'membro');
             downloadXml('membros.xml', xml);
             showNotification('XML dos membros exportado.', 'success');
         }
 
         function exportLaunchesXml() {
-            const rows = getLaunches();
+            const rows = getFilteredLaunches();
             const xml = serializeToXml(rows, 'lancamentos', 'lancamento');
             downloadXml('lancamentos.xml', xml);
             showNotification('XML dos lançamentos exportado.', 'success');
@@ -1158,9 +1379,20 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             preencherAnosPeriodo();
+            synchronizeDefaultMembers();
             populateEmployeeSelect();
+            populateCoordinatorMembers();
             renderMembersTable();
             renderLaunchesTable();
+            setTheme(readStorage(STORAGE_KEYS.theme, 'system'));
+            updateAccessFields();
+            applySession();
+
+            document.getElementById('accessRole').addEventListener('change', updateAccessFields);
+            document.getElementById('accessForm').addEventListener('submit', handleAccess);
+            document.getElementById('coordinatorForm').addEventListener('submit', saveCoordinator);
+            document.getElementById('themeSelect').addEventListener('change', (event) => setTheme(event.target.value));
+            document.getElementById('logoutBtn').addEventListener('click', () => { const state = getAccessState(); state.session = null; state.pendingPin = null; saveAccessState(state); document.getElementById('accessForm').reset(); updateAccessFields(); applySession(); });
 
             document.getElementById('benefitType').addEventListener('change', atualizarAnoFinalPorBeneficio);
             document.getElementById('anoInicio').addEventListener('change', atualizarAnoFinalPorBeneficio);
@@ -1194,9 +1426,13 @@
             document.querySelectorAll('.tab-button').forEach((button) => {
                 button.addEventListener('click', () => {
                     const { tab } = button.dataset;
-                    document.querySelectorAll('.tab-button').forEach((item) => item.classList.toggle('active', item === button));
-                    document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.id === `panel-${tab}`));
+                    setActiveTab(tab);
                 });
+            });
+
+            document.querySelector('.tabs').addEventListener('click', (event) => {
+                const button = event.target.closest('.tab-button');
+                if (button && !button.hidden) setActiveTab(button.dataset.tab);
             });
         });
     </script>
